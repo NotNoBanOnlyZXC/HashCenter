@@ -2,43 +2,46 @@ import os
 import requests
 import time
 import sys
+import webbrowser
 
+v = '1.11'
+txt = f'| HashCenter v{v}\n'
 from packaging import version
 
 def clear():
     os.system('cls')
 
-print(' > Подготовка...')
+print(txt+' > Подготовка...')
 time.sleep(.7)
 try:
     clear()
     os.mkdir('./bin/')
-    print(' > Подготовка...')
+    print(txt+' > Подготовка...')
 except: pass
 try:
     clear()
     os.mkdir('./bin/releases/')
-    print(' > Подготовка...')
+    print(txt+' > Подготовка...')
 except: pass
 try:
     clear()
     os.mkdir('./bin/center/')
-    print(' > Подготовка...')
+    print(txt+' > Подготовка...')
 except: pass
 try:
     clear()
     os.mkdir('./bin/center/telehash/')
-    print(' > Подготовка...')
+    print(txt+' > Подготовка...')
 except: pass
 try:
     clear()
     os.mkdir('./bin/center/telehash/temp/')
-    print(' > Подготовка...')
+    print(txt+' > Подготовка...')
 except: pass
 clear()
 
 def check_version():
-    print(' > Проверяем наличие обновлений...')
+    print(txt+' > Проверяем наличие обновлений...')
     local_version = get_local_version()
     latest_version = get_latest_version()
 
@@ -64,6 +67,13 @@ def get_latest_version():
     releases_url = 'https://github.com/NoBanOnlyZXC/Telehash/releases/latest'
     response = requests.get(releases_url)
     latest_version = response.url.split('/')[-1]  # Получаем номер последнего релиза из URL (например, v1.0.0)
+
+    return latest_version
+
+def get_hash_latest_version():
+    releases_url = 'https://github.com/NoBanOnlyZXC/HashCenter/releases/latest'
+    response = requests.get(releases_url)
+    latest_version = response.url.split('/')[-1]
 
     return latest_version
 
@@ -98,18 +108,30 @@ def update_local_version(version):
 
 def run_program():
     clear()
-    print(' > Запускаем Telehash...')
+    print(txt+' > Запускаем Telehash...')
     program_path = '.\\bin\\releases\\Telehash.exe'
 
-    os.system(program_path)  # Запускаем программу
+    import subprocess as sp
+    process = sp.Popen(program_path)  # Запускаем программу
+    code = process.wait()
+ 
+    print(code)
+
+if get_hash_latest_version() > v:
+    print(f'Найдено обновление для Hash Center ({v} -> {get_hash_latest_version()})')
+    inp = input('Напишите 1 для перехода к скачиванию\nНажмите Enter для пропуска')
+    if inp == '1': 
+        webbrowser.open('https://github.com/NoBanOnlyZXC/HashCenter/releases/latest', new=2)
+        sys.exit()
 
 if get_local_version() == '0.0.0':
-    choice = input(f'''-= HashCenter v1.0 =-
-Вы собираетесь установить Telehash.
+    choice = input(f'''Вы собираетесь установить Telehash.
 > Software card
 ╔ Telehash
 ║ {get_latest_version()}
-╚ Beta edition''')
+╚ Beta edition
+Для подтверждения напишите 1
+''')
     if choice == '1':
         check_version()
     else:
